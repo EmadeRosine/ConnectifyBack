@@ -18,12 +18,24 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
 
+// server.js (add this line)
+// ...
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/metrics', metricRoutes);
 
+// Add a simple root route for health checks or basic confirmation
+app.get('/', (req, res) => {
+    res.status(200).send('Connectify Backend is alive!');
+});
+
+// IMPORTANT: Add a catch-all for 404s (optional but good practice)
+app.use((req, res) => {
+  res.status(404).send('API endpoint not found.');
+});
+
 // Server start
 app.listen(process.env.PORT, () => {
-  console.log(`🚀 Server running on http://192.168.1.167:${process.env.PORT}`);
+  console.log(`🚀 Server running on port ${process.env.PORT}`); // Removed local IP
 });
