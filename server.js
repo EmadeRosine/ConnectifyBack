@@ -25,17 +25,27 @@ app.use('/api/users', userRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/metrics', metricRoutes);
 
-// Add a simple root route for health checks or basic confirmation
-app.get('/', (req, res) => {
-    res.status(200).send('Connectify Backend is alive!');
+// server.js
+
+// ... your routes and other middleware
+
+// Error Handling Middleware (MUST be the last app.use)
+app.use((err, req, res, next) => {
+    console.error(err.stack); // Log the error stack to Vercel logs
+    res.status(err.statusCode || 500).json({
+        success: false,
+        message: err.message || 'Internal Server Error',
+        // In production, you might remove err.stack for security
+        // stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
 });
 
-// IMPORTANT: Add a catch-all for 404s (optional but good practice)
+// IMPORTANT: This catch-all 404 should be BEFORE your error handler
 app.use((req, res) => {
   res.status(404).send('API endpoint not found.');
 });
 
-// Server start
+// Your app.listen
 app.listen(process.env.PORT, () => {
-  console.log(`🚀 Server running on port ${process.env.PORT}`); // Removed local IP
+    console.log(`🚀 Server running on port ${process.env.PORT}`);
 });
